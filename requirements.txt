@@ -1,4 +1,4 @@
-numpy==1.14
-pandas==0.23
-cdt==0.5.23
-networkx==2.4
+numpy>=2.1.1
+pandas>=2.2.3
+networkx>=3.4.2
+causallearn==0.1.3

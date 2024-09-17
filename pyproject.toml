@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "causal_ica_aroma"
+version = "0.1.0"
+description = "Causal ICA-AROMA method for denoising in-scanner head motion on rsfMRI"
+authors = [
+    { name = "Olawale Salaudeen", email = "olawale@mit.edu" },
+    { name = "Paul Camacho", email = "pcamach2@illinois.edu" }
+]
+requires-python = ">=3.11"
+license = { text = "MIT" }
+readme = { file = "README.md", content-type = "text/markdown" }
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+
+dependencies = [
+    "numpy",
+    "pandas",
+    "networkx",
+    "causal-learn"
+]
+
+[project.urls]
+homepage = "https://github.com/olawalesalaudeen/Causal-ICA-AROMA"
+repository = "https://github.com/olawalesalaudeen/Causal-ICA-AROMA"
+
+[tool.setuptools.packages.find]
+where = ["."]
