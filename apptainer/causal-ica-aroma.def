@@ -1,0 +1,103 @@
+Bootstrap: docker
+From: ubuntu:focal-20241011
+
+%files
+    ./graph_AROMA*py /opt/graph_AROMA/
+    ./requirements.txt /opt/requirements.txt
+
+# Install dependencies
+%post 
+    apt-get update && apt-get install -y \
+    wget \
+    curl \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    libffi-dev \
+    libffi7 \
+    git && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh && \
+    bash /tmp/miniconda.sh -b -p /opt/miniconda && \
+    rm /tmp/miniconda.sh && \
+    /opt/miniconda/bin/conda init && \
+    /opt/miniconda/bin/conda create -y -n myenv python=3.6 && \
+    /opt/miniconda/bin/conda install -y -n myenv -c conda-forge --file /opt/requirements.txt && \
+    /opt/miniconda/bin/conda install -y -n myenv scipy scikit-learn joblib tqdm statsmodels requests pip && \
+    /opt/miniconda/bin/conda install -y -n myenv -f libgfortran=3.0.0 && \
+    . /opt/miniconda/etc/profile.d/conda.sh && \
+    conda activate myenv && \
+    pip3 install --target /opt/miniconda/envs/myenv/lib/python3.6/site-packages GPUtil cdt==0.5.23 numpy==1.14 torch
+    conda create --name fsl_install_env python=3.11 && \
+    conda activate fsl_install_env && \
+    conda install -c conda-forge wget && \
+    cd /opt && wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py && \
+    python fslinstaller.py -V 6.0.6 -d /usr/local/fsl -m && \
+    rm fslinstaller.py && \
+    conda env remove --name fsl_install_env && \
+    . /opt/miniconda/etc/profile.d/conda.sh && \
+    conda activate myenv
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get -qq update && \
+    apt-get -qq install -y apt-utils && \
+    apt-get -qq install -y locales dialog && \
+    locale-gen en_US.UTF-8 && \
+    update-locale LANG=en_US.UTF-8
+    echo "America/Chicago" > /etc/timezone && \
+    apt-get -qq install -y tzdata && \
+    dpkg-reconfigure -f noninteractive tzdata
+    apt-get install apt-transport-https -y
+    apt-get install -qq -y software-properties-common zip build-essential
+    apt-get -qq install libssl-dev -y
+    apt-get -qq install libgmp3-dev  -y
+    apt-get -qq install libcurl4-gnutls-dev -y 
+    # apt-get -qq install libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev -y
+    apt-get -qq install libxml2-dev -y
+    # apt-get -qq install libv8-dev -y
+    apt-get -qq install libcurl4-openssl-dev -y
+    apt-get -qq install libgsl-dev -y
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+    # add the R 4.0 repo from CRAN -- adjust 'focal' to 'groovy' or 'bionic' as needed
+    add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
+    apt-get -qq update && apt-get -qq install r-base -y
+    rm -f /var/lib/dpkg/lock-frontend
+    apt-get -qq install -f
+    cd /opt && git clone https://github.com/eddelbuettel/r2u.git && \
+    cd r2u/inst/scripts && bash ./add_cranapt_focal.sh 
+    apt-get -qq update && apt-get -qq install r-cran-devtools r-cran-mass r-cran-lattice -y
+    rm -f /var/lib/dpkg/lock-frontend
+    apt-get -qq install -f
+    apt-get -qq install -y r-cran-httr2 \
+    r-cran-sfsmisc \
+    r-cran-clue \
+    r-cran-pkgdown \
+    r-cran-gh \
+    r-cran-v8 \
+    r-cran-profvis \
+    r-cran-foghorn \
+    r-cran-fastica
+    Rscript -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/randomForest/randomForest_4.6-14.tar.gz", repos=NULL, type="source")'
+    Rscript -e 'install.packages("BiocManager")'
+    Rscript -e 'BiocManager::install(c("igraph"))'
+    Rscript -e 'install.packages(c("graph", "RBGL"), repos="http://cran.us.r-project.org", quiet=TRUE, verbose=FALSE)'
+    Rscript -e 'BiocManager::install(c("SID", "bnlearn", "pcalg", "kpcalg", "glmnet", "mboost"))'
+    Rscript -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/CAM/CAM_1.0.tar.gz", repos=NULL, type="source")'
+    Rscript -e 'install.packages("https://cran.r-project.org/src/contrib/sparsebnUtils_0.0.8.tar.gz", repos=NULL, type="source")'
+    Rscript -e 'BiocManager::install(c("ccdrAlgorithm", "discretecdAlgorithm"))'
+    Rscript -e 'library(devtools); install_github("cran/CAM"); install_github("cran/momentchi2"); install_github("Diviyan-Kalainathan/RCIT", quiet=TRUE, verbose=FALSE)'
+    Rscript -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/sparsebn/sparsebn_0.1.2.tar.gz", repos=NULL, type="source")'
+    echo ". /opt/miniconda/etc/profile.d/conda.sh" >> $APPTAINER_ENVIRONMENT
+    echo "conda activate myenv" >> $APPTAINER_ENVIRONMENT
+
+
+%environment
+    export FSLDIR=/usr/local/fsl
+    export PATH=/usr/local/fsl/bin:/opt/graph_AROMA:$PATH
+    export FSLMULTIFILEQUIT=TRUE
+    export POSSUMDIR=/usr/local/fsl
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/fsl/lib
+    export FSLOUTPUTTYPE=NIFTI_GZ
+    export PYTHONPATH="/opt/miniconda/envs/myenv/lib/python3.6/site-packages:/usr/lib/x86_64-linux-gnu:/opt/graph_AROMA"
+
+%runscript
+    . opt/miniconda/etc/profile.d/conda.sh && conda activate myenv && exec python3.6 /opt/graph_AROMA/graph_AROMA.py "$@"
