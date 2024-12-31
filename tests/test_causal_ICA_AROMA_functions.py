@@ -19,12 +19,12 @@ class TestCausalICAAROMAFuncs(unittest.TestCase):
             (0, 3),  # Node 3 has all parents in aroma_motion_ICs
             (1, 3),
             (2, 3),
+            (10, 6),  # Node 6 has all parents in aroma_motion_ICs
             (4, 5),  # Node 5 has only a subset of parents in aroma_motion_ICs
             (6, 5),
             (10, 5),
-            (7, 8),  # Node 8 has no parents in aroma_motion_ICs
-            (19, 8),  # Node 8 has no parents in aroma_motion_ICs
-            (10, 6),  # Additional sparse edges
+            (7, 8),  # Additional sparse edges
+            (19, 8),
             (18, 19),
             (19, 20),
             (30, 31),
@@ -32,7 +32,7 @@ class TestCausalICAAROMAFuncs(unittest.TestCase):
         G.add_edges_from(edges)
 
         # Expected updated motion ICs
-        expected_motion_ICs = aroma_motion_ICs + [3, 5]
+        expected_motion_ICs = aroma_motion_ICs + [3, 6]
         expected_motion_ICs.sort()
 
         # Updated motion ICs
@@ -40,6 +40,8 @@ class TestCausalICAAROMAFuncs(unittest.TestCase):
             G, causal_criterion, aroma_motion_ICs
         )
 
+        print(expected_motion_ICs)
+        print(updated_motion_ICs)
         # Check that all motion_ICs are included in the updated list
         self.assertTrue(updated_motion_ICs == expected_motion_ICs)
 
