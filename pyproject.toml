@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "causal_ica_aroma"
 version = "0.1.0"
-description = "Causal ICA-AROMA method for denoising in-scanner head motion on rsfMRI"
+description = "Causal ICA-AROMA method for denoising in-scanner head motion in rsfMRI"
 authors = [
     { name = "Olawale Salaudeen", email = "olawale@mit.edu" },
     { name = "Paul Camacho", email = "pcamach2@illinois.edu" }
