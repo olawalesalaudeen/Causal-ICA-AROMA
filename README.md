@@ -70,6 +70,8 @@ python -m causal_ica_aroma.causal_ICA_AROMA \
   -t /datain/fmriprep/sub-001/ses-A/func/sub-001_ses-A_task-rest_dir-AP_run-1_desc-confounds_timeseries.tsv
 ```
 
+'out' should be /datain/fmriprep/sub-001/ses-A/func to update motion files in fmriprep output for followup analysis, but can be another directory.
+
 ---
 
 ### Apptainer Image
@@ -106,3 +108,5 @@ apptainer run --nv --cleanenv --contain -B /path/to/bids/derivatives:/datain,/pa
   -j /datain/fmriprep/sub-001/ses-A/func/sub-001_ses-A_task-rest_dir-AP_run-1_desc-confounds_timeseries.json \
   -t /datain/fmriprep/sub-001/ses-A/func/sub-001_ses-A_task-rest_dir-AP_run-1_desc-confounds_timeseries.tsv
 ```
+
+'out' should be /datain/fmriprep/sub-001/ses-A/func to update motion files in fmriprep output for followup analysis, but can be another directory.
